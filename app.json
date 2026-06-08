@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "berealclone",
+    "name": "Fanklin's App",
     "slug": "berealclone",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -8,7 +8,8 @@
     "scheme": "berealclone",
     "userInterfaceStyle": "automatic",
     "ios": {
-      "icon": "./assets/expo.icon"
+      "icon": "./assets/myicon/icon.png",
+      "bundleIdentifier": "com.anonymous.berealclone"
     },
     "android": {
       "adaptiveIcon": {
