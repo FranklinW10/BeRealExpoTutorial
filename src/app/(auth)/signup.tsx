@@ -1,6 +1,6 @@
 import {useAuth} from "@/context/AuthContext";
 import { router, useRouter,} from 'expo-router';
-import { createContext, ReactNode, useState,useContext, } from "react";
+import { createContext, ReactNode, useState,useContext, useEffect} from "react";
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ActivityIndicator} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 export default function SignUpScreen() {
@@ -20,7 +20,9 @@ export default function SignUpScreen() {
         setIsLoading(true)
         try{
             await signUp(email, password);
+            router.push("/(auth)/onboarding")
         }catch(error){
+            console.error(error);
             Alert.alert("Error","Faild to sign up. Please try again.");
         }finally{
             setIsLoading(false)
@@ -52,7 +54,7 @@ export default function SignUpScreen() {
                         secureTextEntry
                         style ={styles.input}
                     />
-                    <TouchableOpacity style ={styles.button}>
+                    <TouchableOpacity style ={styles.button} onPress={handleSignUp}>
                         {isLoading ? (
                             <ActivityIndicator size={24} color="#fff"/>
                         ):(

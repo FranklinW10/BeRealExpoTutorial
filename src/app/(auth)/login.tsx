@@ -1,8 +1,30 @@
+import {useAuth} from "@/context/AuthContext";
 import { router, useRouter } from 'expo-router';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import { createContext, ReactNode, useState,useContext, useEffect} from "react";
+import { View, Text, TextInput, TouchableOpacity, StyleSheet,Alert, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+
 export default function LoginScreen() {
     const router = useRouter();
+    const [email, setEmail]= useState("");
+    const [password, setPassword]= useState("");
+    const [isLoading, setIsLoading] = useState(false);
+    const {signIn} =useAuth();
+    const handleSignIn = async() =>{
+        if(!email || !password){
+            Alert.alert("Error", "Please fill in all feilds")
+        }
+        setIsLoading(true)
+        try{
+            await signIn(email, password);
+            router.push("/(tabs)")
+        }catch(error){
+            console.error(error);
+            Alert.alert("Error","Incorrect email or password. Please try again.");
+        }finally{
+            setIsLoading(false)
+        }
+    };
     return (
         <SafeAreaView edges={["top","bottom"]} style ={styles.container}>
             <View style ={styles.content} >
@@ -15,20 +37,28 @@ export default function LoginScreen() {
                         keyboardType='email-address'
                         autoComplete='email'
                         autoCapitalize='none'
+                        value={email}
+                        onChangeText={setEmail}
                         style ={styles.input}
                     />
                     <TextInput
                         placeholder="Password..."
                         placeholderTextColor={"#999"}
                         autoComplete='password'
+                        value={password}
+                        onChangeText={setPassword}
                         autoCapitalize='none'
                         secureTextEntry
                         style ={styles.input}
                     />
-                    <TouchableOpacity style ={styles.button}>
+                    <TouchableOpacity style ={styles.button} onPress={handleSignIn}>
+                        {isLoading? (
+                          <ActivityIndicator size={24} color="#fff"/>
+                        ): (
                         <Text style = {styles.buttontext}>
                             Sign In
                         </Text>
+                        )}
                     </TouchableOpacity>
                     <TouchableOpacity style ={styles.linkbutton} onPress={()=>router.push("/(auth)/signup")}>
                         <Text style = {styles.linkbuttontext}>
