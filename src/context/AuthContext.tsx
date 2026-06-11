@@ -14,11 +14,13 @@ interface AuthContextType {
     signUp: (email: string, password: string)=>Promise<void>;  
     signIn: (email: string, password: string)=>Promise<void>;  
     updateUser: (userData: Partial<User>) => Promise<void>;
+    isLoading: boolean;
 }
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 export const AuthProvider = ({children}: {children: ReactNode}) => {
     const [user, setUser] = useState<User | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(()=>{
         checkSession();
@@ -39,6 +41,8 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
             console.error("Error checking session:", error);
             setUser(null);
 
+        }finally{
+            setIsLoading(false)
         }
     }
     const fetchUserProfile = async(userId:string): Promise<User | null> => {
@@ -121,7 +125,7 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
 
 
     };
-    return <AuthContext.Provider value ={{user,signUp, updateUser,signIn}}>
+    return <AuthContext.Provider value ={{user,signUp, updateUser,signIn,isLoading }}>
         {children}
     </AuthContext.Provider>;
 };

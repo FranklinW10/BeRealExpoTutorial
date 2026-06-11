@@ -1,15 +1,19 @@
 import { AuthProvider,useAuth } from "@/context/AuthContext";
 import { Stack, useRouter, useSegments} from "expo-router";
 import{ useEffect } from "react";
+import { ActivityIndicator, View } from "react-native";
+
 
 function RouteGaurd() {
   const router = useRouter();
-  const {user} = useAuth();
+  const {user, isLoading } = useAuth();
   const segments = useSegments();
 
   const inAuthGroup = segments[0] === "(auth)"
   const inTabsGroup = segments[0] === "(tabs)"
+
   useEffect(() => {
+    if (isLoading) return;
     if(!user){
       if(!inAuthGroup){
       router.replace("/(auth)/login");
@@ -19,7 +23,17 @@ function RouteGaurd() {
         router.replace("/(tabs)")
       }
     }
-  },[user, segments, router]);
+    
+  },[user, segments, router, isLoading]);
+  // if (isLoading){
+  //   return null
+  // };
+
+    if (isLoading) return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <ActivityIndicator size="large" />
+      </View>
+    );
   return (
     <AuthProvider>
       <Stack screenOptions = {{headerShown: false}}>
