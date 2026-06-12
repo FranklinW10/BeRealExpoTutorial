@@ -35,12 +35,12 @@ function RouteGaurd() {
       </View>
     );
   return (
-    <AuthProvider>
+
       <Stack screenOptions = {{headerShown: false}}>
         <Stack.Screen name="(tabs)"/>
         <Stack.Screen name="(auth)"/>
       </Stack>
-    </AuthProvider>
+
   );
 }
 export default function RootLayout() {

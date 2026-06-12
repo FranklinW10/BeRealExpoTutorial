@@ -17,7 +17,7 @@ export interface Post{
     created_at: string;
     expires_at: string;
     is_active: boolean;
-    profiles?: PostUser;
+    Profiles?: PostUser;
 }
 
 export const usePosts =() => {
@@ -32,7 +32,9 @@ export const usePosts =() => {
     const loadPosts = async()=> {
         if (!user) return
         setIsLoading(true)
+
         try{
+
             const { data: postsData, error: postsError} = await supabase
                 .from("posts")
                 .select(
@@ -48,6 +50,9 @@ export const usePosts =() => {
                 console.error("Error loading posts:", postsError);
                 throw postsError;
             }
+            if(postsData && postsData.length > 0) {
+                console.log("First post data:", JSON.stringify(postsData[0]));
+            }
             if(!postsData || postsData.length === 0 ){
                 setPosts([]);
                 return;
@@ -55,7 +60,7 @@ export const usePosts =() => {
             }
             const postsWithProfiles =postsData.map((post)=>({
                 ...post,
-                profiles: post.profiles || null
+                profiles: post.Profiles || null
 
             }))
             setPosts(postsWithProfiles)
@@ -73,6 +78,16 @@ export const usePosts =() => {
             throw new Error("User Not Authenticated")
         }
         try{
+        
+            //deactivate any existing posts 
+            const{error: deactivateError} = await supabase
+                .from("posts")
+                .update({is_active: false})
+                .eq("user_id",user.id)
+                .eq("is_active",true)
+            if(deactivateError){
+                console.error("Error deactivating old posts:", deactivateError)
+            }
             //calculating expire time
             const imageUrl = await uploadPostImage(user.id, imageUri);
             const now = new Date()
@@ -93,11 +108,17 @@ export const usePosts =() => {
                 console.error("Error creating post:", error);
                 throw error;
             }
-
+            //Refresh posts
+            await loadPosts()
         }catch(error){
             console.error("Error in createPost:", error);
             throw error;
         }
     };
-    return{createPost, posts};
+
+    const refreshPosts = async() =>{
+        await loadPosts()
+
+    }
+    return{createPost, posts, refreshPosts};
 }

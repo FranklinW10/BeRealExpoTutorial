@@ -9,8 +9,8 @@ import { View,
     StyleSheet, 
     Alert, 
     ActivityIndicator,
-    Image
 } from 'react-native';
+import {Image} from "expo-image";
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as ImagePicker from "expo-image-picker";
 import { supabase } from "@/lib/supabse/client";
@@ -148,8 +148,12 @@ export default function SignUpScreen() {
                     <TouchableOpacity style={styles.imagecontainer} onPress={showImagePicker}>
                         {profileImage ? (
                             <Image 
+                                cachePolicy={"none"}
                                 source={{ uri: profileImage}} 
-                                style={styles.profileImage}/>
+                                style={styles.profileImage}
+                                
+                                />
+                                
                         ) :(
                         <View style={styles.placeholderimage}>
                             <Text>

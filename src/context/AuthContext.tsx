@@ -15,6 +15,7 @@ interface AuthContextType {
     signIn: (email: string, password: string)=>Promise<void>;  
     updateUser: (userData: Partial<User>) => Promise<void>;
     isLoading: boolean;
+    signOut: () => Promise<void>;
 }
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
@@ -25,6 +26,11 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
     useEffect(()=>{
         checkSession();
     },[])
+
+    const signOut = async() =>{
+        await supabase.auth.signOut();
+        setUser(null);
+    };
 
     const checkSession = async() =>{
         try{
@@ -115,8 +121,12 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
             if(userData.username !==undefined) updateData.username = userData.username;
             if(userData.profileImage !==undefined) updateData.profile_image_url = userData.profileImage;
             if(userData.onboardingCompleated !==undefined) updateData.onboarding_completed = userData.onboardingCompleated;
-            const{error} = await supabase.from("Profiles").update(updateData).eq("id", user.id);
+            const{error, data} = await supabase.from("Profiles").update(updateData).eq("id", user.id).select().single();
             if (error) throw error;
+            if (data){
+                const profile = await fetchUserProfile(data.id)
+                setUser(profile)
+            }
         }catch(error){
             console.error("Error updating user:",error);
             throw error;
@@ -125,9 +135,9 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
 
 
     };
-    return <AuthContext.Provider value ={{user,signUp, updateUser,signIn,isLoading }}>
+    return (<AuthContext.Provider value ={{user,signUp, updateUser,signIn,isLoading, signOut}}>
         {children}
-    </AuthContext.Provider>;
+    </AuthContext.Provider>);
 };
 
 export const useAuth = () => {
