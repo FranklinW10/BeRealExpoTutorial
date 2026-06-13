@@ -112,6 +112,7 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
             setUser(profile)
         }
     }
+    
     const updateUser =async (userData: Partial<User>) => {
         if(!user) return;
 

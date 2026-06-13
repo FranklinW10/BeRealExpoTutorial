@@ -11,6 +11,7 @@ function RouteGaurd() {
 
   const inAuthGroup = segments[0] === "(auth)"
   const inTabsGroup = segments[0] === "(tabs)"
+  console.log("User:", JSON.stringify(user));
 
   useEffect(() => {
     if (isLoading) return;
@@ -18,6 +19,8 @@ function RouteGaurd() {
       if(!inAuthGroup){
       router.replace("/(auth)/login");
       }
+    } else if (!user.onboardingCompleated) {
+    router.replace("/(auth)/onboarding");
     }else{
       if(!inTabsGroup){
         router.replace("/(tabs)")
